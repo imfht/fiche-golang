@@ -12,6 +12,7 @@ you could get an url to your paste as a response. e.g.:
 ```
 https://p.fht.im/BoUI
 ```
+
 # Server-side useage
 ## Installation
 1. Clone
@@ -39,6 +40,22 @@ for example, I want to run a public fiche server with prefix https://p.fht.im an
 ```
 ./paste_server --prefix https://p.fht.im --dir /data/fiche_data --host "0.0.0.0"
 ```
+
+## Example nginx config
+Add a built-in server for fiche-golang is simple, try to add it yourself or use nginx to server the file. here is an example.
+```nginx
+server {
+    listen 80;
+    server_name mysite.com www.mysite.com;
+    charset utf-8;
+
+    location / {
+            root /data/fiche_data/;
+            index index.txt index.html;
+    }
+}
+```
+Fiche has no http server built-in, thus you need to setup one if you want to make files available through http.
 
 ## TODO
 - [ ] Build executable for common platform
