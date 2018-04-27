@@ -75,7 +75,7 @@ server {
 Fiche has no http server built-in, thus you need to setup one if you want to make files available through http.
 
 # Release
-if you are using amd 64 Linux, you can download [https://github.com/imfht/fiche-golang/raw/master/fiche-golang] and run directly.
+if you are using amd 64 Linux, you can download [https://github.com/imfht/fiche-golang/raw/master/filche-golang](https://github.com/imfht/fiche-golang/raw/master/filche-golang) and run directly.
 
 # About p.fht.im
 For test purpose only. Server will automatic delete file when disk usage>85%. So *DO NOT PUT ANY IMPORTANT FILE TO P.FHT.IM*.
