@@ -87,4 +87,4 @@ BTW, If your could donate a disk server, fht.im may could be another sm.ms.
 - [ ] Add a systemd example
 - [ ] Add a dockerfile
 - [ ] Maybe add more options such as white-list etc..
-- [ ] Maybe I should limit file size to avoid memory leak.
+- [x] Maybe I should limit file size to avoid memory leak.

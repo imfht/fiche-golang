@@ -1,16 +1,17 @@
 package main
 
 import (
+	"io"
 	"fmt"
 	"os"
 	"net"
-	"io/ioutil"
 	"math/rand"
 	"time"
 	"flag"
 	"github.com/couchbase/goutils/logging"
 	"strings"
 	"gopkg.in/h2non/filetype.v1"
+	"github.com/pkg/errors"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz" +
@@ -53,12 +54,41 @@ func MakeRandomDirectory(base_dir string, perm os.FileMode) string {
 	return randstr
 }
 
+const MAX_UPLOAD_SIZE = 4096 * 1024
+
+func readAll(r io.Reader) (b []byte, err error) {
+	buf := make([]byte, 0, MAX_UPLOAD_SIZE) // buffer size=max size
+	tmp := make([]byte, MAX_UPLOAD_SIZE/8)  // using small tmo buffer for demonstrating
+	exitByEof := false
+	totalByte := 0
+	for totalByte < MAX_UPLOAD_SIZE {
+		n, err := r.Read(tmp)
+		if err != nil {
+			if err != io.EOF {
+				fmt.Println("read error:", err)
+			} else {
+				exitByEof = true
+			}
+			break
+		}
+		fmt.Println("got", n, "bytes.")
+		totalByte += n
+		buf = append(buf, tmp[:n]...)
+	}
+	if !exitByEof {
+		return buf, errors.New("File Too Large!")
+	}
+	return buf, nil // only consider file too large Exception
+}
+
 func readAndSave(conn *net.TCPConn, dir string, prefix string) {
 	defer conn.Close()
 	logging.Infof("Connection from %s\n", conn.RemoteAddr())
-	data, error2 := ioutil.ReadAll(conn)
+	data, error2 := readAll(conn) // max 10M
+	//ioutil.ReadAll()
 	if error2 != nil {
-		logging.Errorf("Error when read data from socket: %s\n", error2)
+		//logging.Errorf("Error when read data from socket: %s\n", error2)
+		conn.Write([]byte("File Too Large. MAX 4096 kb \n")) // FIXME seems I repeat me again. error2 contains "File Too Large".
 		return
 	}
 	directory := MakeRandomDirectory(dir, 0777)
@@ -72,6 +102,7 @@ func readAndSave(conn *net.TCPConn, dir string, prefix string) {
 		return
 	}
 	f.Write(data)
+
 	f.Close()
 	if extension == ".txt" {
 		conn.Write([]byte(prefix + directory + "\n")) // nginx will auto read index.txt when visit the directory. short url is more friendly.
