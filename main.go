@@ -71,7 +71,7 @@ func readAll(r io.Reader) (b []byte, err error) {
 			}
 			break
 		}
-		fmt.Println("got", n, "bytes.")
+		//fmt.Println("got", n, "bytes.")
 		totalByte += n
 		buf = append(buf, tmp[:n]...)
 	}
