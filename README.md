@@ -14,21 +14,21 @@ http://termbin.com/0zuw
 ```
 ## Fiche-golang
 ```bash
-➜  /tmp cat simple_jpg.jpg| nc p.fht.im 9999
-https://p.fht.im/t4OZ/index.jpg
+➜  /tmp cat simple_jpg.jpg| nc termbin.co 9999
+https://termbin.co/t4OZ/index.jpg
 ```
-and click [https://p.fht.im/t4OZ/index.jpg](https://p.fht.im/t4OZ/index.jpg) you'll see the image.
+and click [https://termbin.co/t4OZ/index.jpg](https://termbin.co/t4OZ/index.jpg) you'll see the image.
 
 # Client-side usage
 for example, use public server
 
 ```bash
-echo "I will always love you" | nc p.fht.im 9999
+echo "I will always love you" | nc termbin.co 9999
 ```
 you could get an url to your paste as a response. e.g.:
 
 ```
-https://p.fht.im/BoUI
+https://termbin.co/BoUI
 ```
 # Server-side useage
 ## Installation
@@ -51,11 +51,11 @@ Usage of ./paste_server:
   -port string
         http listen port (default "9999")
   -prefix string
-        prefix of saved file,eg: https://p.fht.im/ (default "http://127.0.0.1/")
+        prefix of saved file,eg: https://termbin.co/ (default "http://127.0.0.1/")
 ```
-for example, I want to run a public fiche server with prefix https://p.fht.im and store data in /data/fiche_data/, command below.
+for example, I want to run a public fiche server with prefix https://termbin.co and store data in /data/fiche_data/, command below.
 ```
-./paste_server --prefix https://p.fht.im --dir /data/fiche_data --host "0.0.0.0"
+./paste_server --prefix https://termbin.co --dir /data/fiche_data --host "0.0.0.0"
 ```
 
 ## Example nginx config
@@ -77,14 +77,10 @@ Fiche has no http server built-in, thus you need to setup one if you want to mak
 # Release
 if you are using amd 64 Linux, you can download [https://github.com/imfht/fiche-golang/raw/master/filche-golang](https://github.com/imfht/fiche-golang/raw/master/filche-golang) and run directly.
 
-# About p.fht.im
-For test purpose only. Server will automatic delete file when disk usage>85%. So *DO NOT PUT ANY IMPORTANT FILE TO P.FHT.IM*.
-BTW, If your could donate a disk server, fht.im may could be another sm.ms.
-
 ## TODO
 - [ ] Build executable for common platform
 - [ ] Add ipv6 support.
 - [ ] Add a systemd example
 - [ ] Add a dockerfile
 - [ ] Maybe add more options such as white-list etc..
-- [x] Maybe I should limit file size to avoid memory leak.
+- [x] Maybe I should limit file size to avoid memory leak.‰‰‰
