@@ -44,35 +44,9 @@ go build main.go
 ## Usage
 ```
 Usage of ./paste_server:
-  -dir string
-        directory (default "/tmp")
-  -host string
-        bind ip (default "127.0.0.1")
-  -port string
-        http listen port (default "9999")
   -prefix string
         prefix of saved file,eg: https://termbin.co/ (default "http://127.0.0.1/")
 ```
-for example, I want to run a public fiche server with prefix https://termbin.co and store data in /data/fiche_data/, command below.
-```
-./paste_server --prefix https://termbin.co --dir /data/fiche_data --host "0.0.0.0"
-```
-
-## Example nginx config
-Add a built-in server for fiche-golang is simple, try to add it yourself or use nginx to server the file. here is an example.
-```nginx
-server {
-    listen 80;
-    server_name mysite.com www.mysite.com;
-    charset utf-8;
-
-    location / {
-            root /data/fiche_data/;
-            index index.txt index.html;
-    }
-}
-```
-Fiche has no http server built-in, thus you need to setup one if you want to make files available through http.
 
 # Release
 if you are using amd 64 Linux, you can download [https://github.com/imfht/fiche-golang/raw/master/filche-golang](https://github.com/imfht/fiche-golang/raw/master/filche-golang) and run directly.

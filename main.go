@@ -1,19 +1,21 @@
 package main
 
 import (
-	"io"
-	"fmt"
-	"os"
-	"net"
-	"math/rand"
-	"time"
 	"flag"
+	"fmt"
 	"github.com/couchbase/goutils/logging"
-	"strings"
-	"gopkg.in/h2non/filetype.v1"
 	"github.com/pkg/errors"
+	"gopkg.in/h2non/filetype.v1"
+	"io"
+	"math/rand"
+	"net"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 )
 
+const MaxUploadSize = 4096 * 1024
 const charset = "abcdefghijklmnopqrstuvwxyz" +
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
@@ -36,7 +38,7 @@ func getFileExtension(buf []byte) string {
 }
 func DirExists(directory string) bool {
 	_, err := os.Stat(directory)
-	return (err == nil)
+	return err == nil
 }
 
 func MakeRandomDirectory(base_dir string, perm os.FileMode) string {
@@ -54,14 +56,12 @@ func MakeRandomDirectory(base_dir string, perm os.FileMode) string {
 	return randstr
 }
 
-const MAX_UPLOAD_SIZE = 4096 * 1024
-
 func readAll(r io.Reader) (b []byte, err error) {
-	buf := make([]byte, 0, MAX_UPLOAD_SIZE) // buffer size=max size
-	tmp := make([]byte, MAX_UPLOAD_SIZE/8)  // using small tmo buffer for demonstrating
+	buf := make([]byte, 0, MaxUploadSize) // buffer size=max size
+	tmp := make([]byte, MaxUploadSize/8)  // using small tmo buffer for demonstrating
 	exitByEof := false
 	totalByte := 0
-	for totalByte < MAX_UPLOAD_SIZE {
+	for totalByte < MaxUploadSize {
 		n, err := r.Read(tmp)
 		if err != nil {
 			if err != io.EOF {
@@ -104,40 +104,45 @@ func readAndSave(conn *net.TCPConn, dir string, prefix string) {
 	f.Write(data)
 
 	f.Close()
-	if extension == ".txt" {
-		conn.Write([]byte(prefix + directory + "\n")) // nginx will auto read index.txt when visit the directory. short url is more friendly.
-	} else {
-		conn.Write([]byte(prefix + fileName + "\n"))
-	}
+	conn.Write([]byte(prefix + fileName + "\n"))
 }
 
+var prefix string
+
+func init() {
+	prefix = os.Getenv("prefix")
+	if len(prefix) == 0 {
+		prefix = "http://127.0.0.1/"
+	}
+}
 func main() {
 	port := flag.String("port", "9999", "http listen port")
-	host := flag.String("host", "127.0.0.1", "bind ip")
-	dir := flag.String("dir", "/tmp/", "directory")
-	prefix := flag.String("prefix", "http://127.0.0.1/", "prefix of saved file,eg: https://p.fht.im/")
+	host := flag.String("host", "0.0.0.0", "bind ip")
 	flag.Parse()
-	addr, error := net.ResolveTCPAddr("tcp", *host + ":" + *port);
+	addr, error := net.ResolveTCPAddr("tcp", *host+":"+*port)
 	if error != nil {
-		fmt.Printf("Cannot parse \"%s\": %s\n", port, error);
-		os.Exit(1);
+		fmt.Printf("Cannot parse \"%s\": %s\n", port, error)
+		os.Exit(1)
 	}
-	listener, error := net.ListenTCP("tcp", addr);
+	listener, error := net.ListenTCP("tcp", addr)
 	if error != nil {
-		fmt.Printf("Cannot listen: %s\n", error);
-		os.Exit(1);
+		fmt.Printf("Cannot listen: %s\n", error)
+		os.Exit(1)
 	}
 	logging.Infof("listen on %s:%s", *host, *port)
 
-	if !strings.HasSuffix(*prefix, "/") {
-		*prefix = *prefix + "/"
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
 	}
+	var dir = "./data/"
+	var fs = http.FileServer(http.Dir("./data"))
+	go http.ListenAndServe("0.0.0.0:80", fs)
 	for { // ever...
-		conn, error := listener.AcceptTCP();
+		conn, error := listener.AcceptTCP()
 		if error != nil {
-			logging.Errorf("Cannot accept: %s\n", error);
-			os.Exit(1);
+			logging.Errorf("Cannot accept: %s\n", error)
+			os.Exit(1)
 		}
-		go readAndSave(conn, *dir, *prefix);
+		go readAndSave(conn, dir, prefix)
 	}
 }
