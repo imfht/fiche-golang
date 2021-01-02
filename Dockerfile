@@ -10,4 +10,4 @@ ENV LC_ALL en_US.UTF-8
 COPY --from=builder /build/fiche-go /app/
 COPY --from=builder /build/data/ /app/data
 WORKDIR /app
-CMD ["./main"]
+CMD ["./fiche-go"]
