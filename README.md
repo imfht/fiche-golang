@@ -1,8 +1,14 @@
 # fiche-golang
 fiche-golang is a command line pastebin for sharing terminal output. inspired by [fiche](https://github.com/solusipse/fiche).
 
+# docker start
+```
+sudo docker run --rm -p 8080:80 -p 9999:9999 -e prefix=http://`curl -s https://api.ipify.org`:8080 filche-go
+```
+
 # New Features
 Old fiche only support txt file, fiche-golang support lots of file format and will auto add extension. for example:
+
 ## Fiche
 
 ```bash
